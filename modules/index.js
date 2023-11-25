@@ -18,6 +18,11 @@ const findQuestion = (qId) => {
     return questionsData.find(q => q.id === qId);
 };
 
+
+const getAnswer = (question, key) => {
+    return question.config.options.find(q => q.id === key);
+};
+
 const app = () => {
     console.info("\n Please enter the following: \n");
     const studentId = prompt("Student ID: ");
@@ -108,28 +113,51 @@ const app = () => {
 
     };
 
+    // Case 3
+    const generateFeedbackReport = (assessment) => {
+        let latestAssessment = getLatestAssessment(assessment);
 
+        if (latestAssessment) {
+            const date = moment(latestAssessment.completed, "DD.MM.YYYY hh.mm.ss").format("Do MMMM gggg LT");
+            console.log(`${studentFullName} has completed ${assessment.name} assessment on ${date}`);
+            const message = "Feedback for wrong answers given below";
+            console.info(`He got ${latestAssessment.results.rawScore} questions right out of ${questionsData.length}. ${message}\n`);
 
+            latestAssessment.responses.forEach(res => {
+                const question = findQuestion(res.questionId);
+                if (question && question.config.key !== res.response) {
+                    const studentAnswer = getAnswer(question, res.response);
+                    const correctAnswer = getAnswer(question, question.config.key);
+                    console.log(`Question: ${question.stem}`);
+                    console.log(`Your answer: ${studentAnswer.label} with value ${studentAnswer.value}`);
+                    console.log(`Right answer: ${correctAnswer.label} with value ${correctAnswer.value}`);
+                    console.log(`Hint: ${question.config.hint}`);
+                }
+            });
+
+            console.info("");
+        }
+    };
+
+    // Loop in case there are multiple assessments
     assessmentsData.forEach(assessment => {
         switch (reportType) {
             case "1":
-                console.log("\n============= Diagnostic Report =============");
+                console.log("\n============= Diagnostic Report =============\n");
                 generateDiagnosticReport(assessment);
                 break;
             case "2":
-                console.log("\n============= Progress Report =============");
+                console.log("\n============= Progress Report =============\n");
                 generateProgressReport(assessment);
                 break;
             case "3":
-                console.log("\n============= Feedback Report =============");
-                // generateFeedbackReport(assessment);
+                console.log("\n============= Feedback Report =============\n");
+                generateFeedbackReport(assessment);
                 break;
             default:
                 console.log("\nNo report generated. Please run the app again and enter report to generate!\n");
         }
     });
-
-    return "App";
 };
 
 module.exports = app;
