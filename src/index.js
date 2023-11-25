@@ -1,13 +1,13 @@
 const assessmentsData = require("./data/assessments.json");
 const studentsData = require("./data/students.json");
 const prompt = require("prompt-sync")();
-const {getLatestAssessment, formatFullName} = require("./generic/helpers");
+const {getLatestAssessment, formatFullName, print} = require("./generic/helpers");
 const generateDiagnosticReport = require("./diagnosticReport");
 const generateProgressReport = require("./progressReport");
 const generateFeedbackReport = require("./feedbackReport");
 
 const app = () => {
-    console.info("\n Please enter the following: \n");
+    print("\nPlease enter the following: \n");
 
     // user inputs
     const studentId = prompt("Student ID: ");
@@ -25,19 +25,19 @@ const app = () => {
 
         switch (reportType) {
             case "1":
-                console.log("\n============= Diagnostic Report =============\n");
+                print("\n============= Diagnostic Report =============\n");
                 generateDiagnosticReport(assessments, latestAssessment, studentName);
                 break;
             case "2":
-                console.log("\n============= Progress Report =============\n");
+                print("\n============= Progress Report =============\n");
                 generateProgressReport(assessments, student);
                 break;
             case "3":
-                console.log("\n============= Feedback Report =============\n");
+                print("\n============= Feedback Report =============\n");
                 generateFeedbackReport(assessments, latestAssessment, studentName);
                 break;
             default:
-                console.log("\nNo report generated. Please run the app again and enter report to generate!\n");
+                print("\nNo report generated. Please run the app again and enter report to generate!\n");
         }
     });
 };

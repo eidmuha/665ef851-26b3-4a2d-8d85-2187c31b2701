@@ -20,7 +20,7 @@ const getLatestAssessment = (assessment, studentId) => {
     return latestAssessment;
 };
 
-// count unique items given an array
+// count unique items along with the keys
 const countUnique = arr => {
     const counts = {};
     for (let i = 0; i < arr.length; i++) {
@@ -36,7 +36,7 @@ const formatFullName = (person) => `${person.firstName} ${person.lastName}`;
 // get a question given question id
 const findQuestion = (qId) => questionsData.find(q => q.id === qId);
 
-// get question answer given the question and key
+// get a question's correct answer
 const getAnswer = (question, key) => question.config.options.find(q => q.id === key);
 
 // simple console output
