@@ -1,6 +1,4 @@
-const app = () => {
-    return "App";
-};
+const app = require("./modules");
+app();
 
-export default app;
 

@@ -1,0 +1,93 @@
+const assessmentsData = require("./data/assessments.json");
+const questionsData = require("./data/questions.json");
+const studentResponsesData = require("./data/student-responses.json");
+const studentsData = require("./data/students.json");
+const prompt = require("prompt-sync")();
+const moment = require("moment");
+
+const countUnique = arr => {
+    const counts = {};
+    for (let i = 0; i < arr.length; i++) {
+        counts[arr[i]] = 1 + (counts[arr[i]] || 0);
+        counts[`${arr[i]} correct answers`] = 0;
+    }
+    return counts;
+};
+
+const findQuestion = (qId) => {
+    return questionsData.find(q => q.id === qId);
+};
+
+const app = () => {
+    console.info("\n Please enter the following: \n");
+    const studentId = prompt("Student ID: ");
+    const reportType = prompt("Report to generate (1 for Diagnostic, 2 for Progress, 3 for Feedback): ");
+    const strands = questionsData.map((item) => item.strand);
+    const strandsCount = countUnique(strands)
+    const student = studentsData.find(st => st.id === studentId);
+
+    const generateProgressReport = (selectedStudent, assessment) => {
+        let latestAssessment = null;
+        studentResponsesData.filter(sResponse => {
+            // getting the latest assessment
+            if (sResponse.student.id === studentId && sResponse.assessmentId === assessment.id) {
+                if (latestAssessment && sResponse.student.yearLevel) {
+                    // get latest response based on the last year
+                    if (sResponse.student.yearLevel > latestAssessment.student.yearLevel) {
+                        latestAssessment = sResponse;
+                    }
+                } else if (sResponse) {
+                    latestAssessment = sResponse;
+                }
+            }
+        });
+
+        // console.log(latestAssessment);
+        if (latestAssessment) {
+            const date = moment(latestAssessment.completed, "DD.MM.YYYY hh.mm.ss").format("Do MMMM gggg LT");
+            console.log(`${selectedStudent.firstName} ${selectedStudent.lastName} has completed ${assessment.name} assessment on ${date}`);
+            console.info(`He got ${latestAssessment.results.rawScore} questions right out of ${questionsData.length}. Details by strand given bellow\n`);
+
+            for (const key in strandsCount) {
+                if (!key.toString().includes("correct answers")) {
+                    latestAssessment.responses.forEach(res => {
+                        const question = findQuestion(res.questionId);
+                        if (question && question.config.key === res.response && key === question.strand) {
+                            strandsCount[`${key} correct answers`] = strandsCount[`${key} correct answers`] + 1;
+                        }
+                    });
+                }
+            }
+
+            for (const key in strandsCount) {
+                if (key.toString().includes("correct answers")) {
+                    console.info(`${key}: ${strandsCount[key]} our of ${strandsCount[key.replace(" correct answers","")]} correct`);
+                }
+            }
+
+            console.info("");
+        }
+
+    };
+
+    assessmentsData.forEach(assessment => {
+        switch (reportType) {
+            case "1":
+                console.log("\n============= Diagnostic Report =============");
+                generateProgressReport(student, assessment);
+                break;
+            case "2":
+                console.log("============= Progress Report =============");
+                break;
+            case "3":
+                console.log("============= Feedback Report =============");
+                break;
+            default:
+                console.log("No report generated. Please run the app again and enter report to generate!");
+        }
+    });
+
+    return "App";
+};
+
+module.exports = app;
