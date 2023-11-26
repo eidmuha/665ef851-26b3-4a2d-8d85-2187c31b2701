@@ -28,9 +28,13 @@ const generateFeedbackReport = (assessment, latestStudentResponse, studentName) 
                 details.push(`Question: ${question.stem}`);
                 details.push(`Your answer: ${studentAnswer.label} with value ${studentAnswer.value}`);
                 details.push(`Right answer: ${correctAnswer.label} with value ${correctAnswer.value}`);
-                details.push(`Hint: ${question.config.hint}`);
+                details.push(`Hint: ${question.config.hint}\n`);
             }
         });
+
+        if (details.length === 0) {
+            details = ["No feedback found"]
+        }
 
         return {title, subTitle, details};
     }

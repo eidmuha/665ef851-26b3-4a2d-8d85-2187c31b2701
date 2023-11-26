@@ -13,6 +13,6 @@ npm install
 # To Run Test Suite
 npm run test
 
-To Start Server and Interact with the CLI App
+# To Start Server and Interact with the CLI App
 npm run app
 ```
