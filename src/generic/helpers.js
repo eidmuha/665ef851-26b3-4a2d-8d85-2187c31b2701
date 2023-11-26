@@ -3,10 +3,14 @@ const questionsData = require("../data/questions.json");
 
 // get student recent assessment.
 // The latest assessment is checked against student year level
-const getLatestAssessment = (assessment, studentId) => {
+const getLatestStudentResponse = (assessment, studentId) => {
     let latestAssessment = null;
     studentResponsesData.filter(sResponse => {
-        if (sResponse.student.id === studentId && sResponse.assessmentId === assessment.id && sResponse.completed) {
+        if (
+            sResponse.student.id === studentId
+            && sResponse.assessmentId === assessment.id
+            && sResponse.completed
+        ) {
             if (latestAssessment && sResponse.student.yearLevel) {
                 // get latest response based on the last year
                 if (sResponse.student.yearLevel > latestAssessment.student.yearLevel) {
@@ -31,7 +35,9 @@ const countUnique = arr => {
 };
 
 // format full name, given a person object
-const formatFullName = (person) => `${person.firstName} ${person.lastName}`;
+const formatFullName = (person) => person.firstName && person.lastName
+    ? `${person.firstName} ${person.lastName}`
+    : person.firstName;
 
 // get a question given question id
 const findQuestion = (qId) => questionsData.find(q => q.id === qId);
@@ -40,6 +46,9 @@ const findQuestion = (qId) => questionsData.find(q => q.id === qId);
 const getAnswer = (question, key) => question.config.options.find(q => q.id === key);
 
 // simple console output
-const print = (output) => console.info(output);
+const print = (output) => {
+    console.info(output);
+    return output;
+}
 
-module.exports = {getLatestAssessment, countUnique, formatFullName, findQuestion, getAnswer, print};
+module.exports = {getLatestStudentResponse, countUnique, formatFullName, findQuestion, getAnswer, print};

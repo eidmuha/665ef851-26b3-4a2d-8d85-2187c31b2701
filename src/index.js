@@ -1,7 +1,7 @@
 const assessmentsData = require("./data/assessments.json");
 const studentsData = require("./data/students.json");
 const prompt = require("prompt-sync")();
-const {getLatestAssessment, formatFullName, print} = require("./generic/helpers");
+const {getLatestStudentResponse, formatFullName, print} = require("./generic/helpers");
 const generateDiagnosticReport = require("./diagnosticReport");
 const generateProgressReport = require("./progressReport");
 const generateFeedbackReport = require("./feedbackReport");
@@ -15,26 +15,41 @@ const app = () => {
 
     // get student data
     const student = studentsData.find(st => st.id === studentId);
+
+    if (student === undefined) {
+        print("\nNo student id provided or found. exiting ....\n");
+        return;
+    }
+
     const studentName = formatFullName(student);
 
     // Loop in case there are multiple assessments
     assessmentsData.forEach(assessments => {
+        // get latest student response based on student's year level
+        let latestStudentResponse = getLatestStudentResponse(assessments, student.id);
 
-        // get latest assessment based on student's year level
-        let latestAssessment = getLatestAssessment(assessments, student.id);
-
+        let result = null;
         switch (reportType) {
             case "1":
                 print("\n============= Diagnostic Report =============\n");
-                generateDiagnosticReport(assessments, latestAssessment, studentName);
+
+                result = generateDiagnosticReport(assessments, latestStudentResponse, studentName);
+                print(`${result.title}\n${result.subTitle}\n\n${result.details.join("\n")}\n`);
+
                 break;
             case "2":
                 print("\n============= Progress Report =============\n");
-                generateProgressReport(assessments, student);
+
+                result = generateProgressReport(assessments, student);
+                print(`${result.title}\n\n${result.details.join("\n")}\n\n${result.info}\n`);
+
                 break;
             case "3":
                 print("\n============= Feedback Report =============\n");
-                generateFeedbackReport(assessments, latestAssessment, studentName);
+
+                result = generateFeedbackReport(assessments, latestStudentResponse, studentName);
+                print(`${result.title}\n${result.subTitle}\n\n${result.details.join("\n")}\n`);
+
                 break;
             default:
                 print("\nNo report generated. Please run the app again and enter report to generate!\n");

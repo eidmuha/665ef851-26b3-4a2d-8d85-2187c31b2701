@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "A CLI simple app for student assessment reporting system",
   "scripts": {
-    "test": "jest",
+    "test": "vitest --run --reporter verbose",
+    "test:watch": "vitest",
     "app": "node app.js"
   },
   "keywords": [
@@ -12,7 +13,7 @@
   "author": "Eddie Basharat",
   "license": "ISC",
   "devDependencies": {
-    "jest": "^29.7.0"
+    "vitest": "^0.34.6"
   },
   "dependencies": {
     "moment": "^2.29.4",
